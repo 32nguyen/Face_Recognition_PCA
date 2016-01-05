@@ -81,5 +81,30 @@ for i = 1:M  % image number
     end
 end
 
+%% 20 element vector of testing images
+test_face= test(:,:,1);
+[~,~,m] = size(test); 
+%imagesc(test_face);colormap(gray(256));
+for i = 1:m
+    test_face= test(:,:,i);
+    face_A = test_face(:)-average_vector_face; % normilized face
+    for k=1:n
+        wface(k,i)  =  dot(face_A,eigenface_vector(:,k)); %20*40 matrix, contribute of 20 eigenface on 
+                                                          %each face in 40 testing faces  
+    end
+end
+
+%% find distance
+distance = distance_mx(wface, weight); % 40*360 
+
+%% test 40 faces
+for i = 1:m
+    face_test = test(:,:,i);
+    [mi,idx] = min(distance(i,:));
+    face_detected = train(:,:,idx);
+    face(:,:,i) = [face_test face_detected];
+end
+image_subfigure(face);
+
 
 
