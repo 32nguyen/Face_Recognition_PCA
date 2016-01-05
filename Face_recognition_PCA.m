@@ -24,7 +24,62 @@ for dir_idx = 1 : num_dirs
     end    
 end
 
+%% Get training and testing parts
+test = double(deck(:,:,1:10:end));  
+train=double(deck); train(:,:,1:10:end) = []; 
+image_subfigure(test);
+% compute average face
+[y,x,M] = size(train); 
+N = x*y; 
+vector_face = zeros(N,M);
+c = zeros(N,1);
+for i=1:M
+    a = train(:,:,i);
+    vector_face(:,i) = a(:);  % vector_face (vector rn ). (N*360 matrix) 360 images of N = width*height elements in column
+    c = c + a(:); % c is single matrix has N = x*y elements in column = sum of 360 images. This is used for showing
+end
+average_vector_face = c/M;      % average of vector_face Nx1 elements in 1 column
+c = reshape(average_vector_face,y,x); % reshape back to image size
+figure; imagesc(c);colormap(gray(256));title('average face');axis image;
+        set(gca, 'XTick', [], 'YTick', []);
 
+%% Difference between each rn vector face to averave vector face
+A = zeros(N,M);
+for i = 1:M
+    A(:,i) =  vector_face(:,i) - average_vector_face; % (N*360 matrix)
+end
+% covariance matrix - MxM dimension
+L = A'*A;
+figure; imagesc(L); title('covariance');colormap(gray(256));axis image;
+
+%% Find Eigen vector in MxM dimension
+[Eigen_vector, Eigen_value] = eig(L); % C*Eigen_vector = Eigen_vector*Eigen_value;
+V = A*Eigen_vector; % N*M matrix Avi in paper
+% eigen faces
+eigenface = [];
+eigen = [];
+for i = 1:M
+    b = V(:,i);
+    eigenface{i} = reshape(b,y,x); % eigenface is y*x*M matrix
+end
+m=diag(Eigen_value);
+[ma,mb] = sort(m,'descend');
+% Set of 20 highest eignvalue
+for i = 1:20
+    eigen{i} = eigenface{mb(i)}; % eigenface_descend is y*x*20 matrix
+    a(:,:,i) = eigen{i};
+    eigenface_vector(:,i) = eigen{i}(:);
+end
+image_subfigure(a); % Display 20 highest priority eigenfaces
+
+%% Calculate the weights
+
+n = 20;% select  eigen faces
+for i = 1:M  % image number
+    for k = 1:n 
+        weight(k,i) = dot(A(:,i),eigenface_vector(:,k)); %% weight is M*20 matrix
+    end
+end
 
 
 
