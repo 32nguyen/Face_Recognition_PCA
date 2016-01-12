@@ -1,5 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Read photos
+% Thanh Nguyen
+% 32nguyen@cua.edu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clc; clear all; close all;
 % Specify path for directory containing sub_directories of all images
